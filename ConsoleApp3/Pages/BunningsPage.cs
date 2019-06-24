@@ -22,8 +22,7 @@ namespace ConsoleApp3.Pages
         private IWebElement add => Driver.FindControl(By.XPath("//span[text()='Added']"));
         private IWebElement myWishList => Driver.FindControl(By.XPath("//strong[text()='Total']"));
 
-        ////strong[text()='Total']
-        //h2[text()='My Wish List']
+    
 
         public BunningsPage bunnigsSerch() {
 
