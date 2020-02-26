@@ -3,6 +3,8 @@ using OpenQA.Selenium;
 using NUnit.Framework;
 using System;
 using ConsoleApp3.Core;
+using System.Collections.Generic;
+using OpenQA.Selenium.Support.UI;
 
 namespace ConsoleApp3.Pages
 {
@@ -17,12 +19,8 @@ namespace ConsoleApp3.Pages
 
         private IWebElement searchInput => Driver.FindControl(By.XPath("//input[@datav3-track-text='search']"));
         private IWebElement search => Driver.FindControl(By.XPath("//button[@datav3-track-text='search']"));
-        private IWebElement seleOneProduct => Driver.FindControl(By.XPath("//section//article[1]/a/div/div[1]/div/div/img"));
-        private IWebElement addOneProduct => Driver.FindControl(By.XPath("//span[text()='Add to Wish List']"));
-        private IWebElement add => Driver.FindControl(By.XPath("//span[text()='Added']"));
-        private IWebElement myWishList => Driver.FindControl(By.XPath("//strong[text()='Total']"));
-
-    
+        private IWebElement addOneProduct => Driver.FindControl(By.XPath("//button[text()='Save to Wishlist']"));
+        private IWebElement myWishList => Driver.FindControl(By.CssSelector("h2[class='primaryh2 custom-title']"));
 
         public BunningsPage bunnigsSerch() {
 
@@ -35,7 +33,15 @@ namespace ConsoleApp3.Pages
 
         public BunningsPage selectOneProduct() {
 
-            seleOneProduct.Click();
+            String products = "//span[text()='product results']";
+            String x = "//div[@class='codified-product-tile__product-image__image--product']";
+
+            WebDriverWait wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(10));
+            wait.Until(e => e.FindElement(By.XPath(products)));
+
+            IList<IWebElement> elements = Driver.FindElements(By.XPath(x));
+            elements[2].Click();
+            Console.WriteLine(""+ elements.Count);
 
             return this;
         }
@@ -43,26 +49,20 @@ namespace ConsoleApp3.Pages
         public BunningsPage addSelectedProduct() {
 
             addOneProduct.Click();
-            var Added = ConfigurationManager.AppSettings["Added"];
-            string str = add.Text;
-            if (Added.Equals(str))
-            {
+            WebDriverWait wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(10));
+            wait.Until(e => e.FindElement(By.CssSelector("a[class='tooltip-wishlist-confirmation__link']")));
 
-                var listUrl = ConfigurationManager.AppSettings["listUrl"];
-                Driver.Navigate().GoToUrl(listUrl);
-            }
-            else {
+            Driver.FindElement(By.CssSelector("a[class='tooltip-wishlist-confirmation__link']")).Click();
 
-                Console.WriteLine("You currently don’t have any items in your Wish List!");
-            }
-           
-           
             return this;
         }
 
         public void AssertProductList() {
 
             var MyWishList = ConfigurationManager.AppSettings["myWishList"];
+            String myWishlist = "h2[class='primaryh2 custom-title']";
+            WebDriverWait wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(10));
+            wait.Until(e => e.FindElement(By.CssSelector(myWishlist)));
             Assert.AreEqual(MyWishList, myWishList.Text);
         }
 
